@@ -8,10 +8,10 @@ description: >-
   "迁移", "重构", "大规模", "规范驱动". Performs full project analysis, task decomposition,
   documentation generation, progress tracking setup, and task-specific sub-SKILL creation
   before any development begins.
-version: 2.0.0
+version: 1.1.0
 ---
 
-# Spec-Driven Develop (Enhanced)
+# Spec-Driven Develop
 
 You are executing the **Spec-Driven Development** workflow — a standardized pre-development pipeline for large-scale complex tasks. Your job is to complete all preparation phases before any actual coding begins, ensuring the project has full analysis, a clear plan, trackable progress documents, and a task-specific SKILL.
 
@@ -26,7 +26,9 @@ You are executing the **Spec-Driven Development** workflow — a standardized pr
 
 When resuming from an existing MASTER.md, perform these checks before doing anything else:
 
-1. **Integrity verification**: Read each `docs/progress/phase-N-*.md` file and count the actual `[x]` checkboxes. Compare with the completion counts in MASTER.md. If they differ, **the phase files are the source of truth** — update MASTER.md counts to match.
+1. **Integrity verification**:
+   - **Standard/Full Mode**: Read each `docs/progress/phase-N-*.md` file and count the actual `[x]` checkboxes. Compare with the completion counts in MASTER.md. If they differ, **the phase files are the source of truth** — update MASTER.md counts to match.
+   - **Lite Mode**: Count the `[x]` checkboxes directly in MASTER.md's embedded task list. No external phase files to verify.
 
 2. **State reconstruction**: Read the "Next Action" field in MASTER.md's "Current Status" section. This contains the exact operation to resume. If this field is missing or unclear, fall back to inferring state from checkbox progress.
 
@@ -111,9 +113,14 @@ When resuming from an existing MASTER.md, perform these checks before doing anyt
 ### Lookback Check (before starting)
 
 Before decomposing tasks, review the Phase 1 outputs:
+
+**Standard/Full Mode**:
 - Are there modules mentioned in the project structure that are missing from the module inventory?
 - Are there dependencies or integration points that were not captured in the risk assessment?
-- If you find gaps, **update the Phase 1 documents first**, and append a note to the Session Log in MASTER.md: `"Phase 1 补充更新: [what was added]"`.
+- If you find gaps, **update the Phase 1 documents first**, and record the update in the phase notes when Phase 3 progress files are created.
+
+**Lite Mode**:
+- Quickly re-scan the project and compare against the quick-summary. If you notice missing files or risks, update `docs/analysis/quick-summary.md`.
 
 > **Lite Mode**: Produce a single `docs/plan/task-list.md` with a flat numbered list of tasks (no phases, no Mermaid diagram). Each task needs: description, effort estimate, and acceptance criteria. Then proceed to Phase 3.
 

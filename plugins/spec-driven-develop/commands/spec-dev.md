@@ -63,7 +63,7 @@ Consolidate findings into `docs/analysis/`:
 
 ### Phase 2: Task Decomposition
 
-**Lookback Check**: Before starting, review Phase 1 outputs for gaps. If modules or risks are missing, update Phase 1 docs and log the update.
+**Lookback Check**: Before starting, review Phase 1 outputs for gaps. In Standard/Full Mode, check module inventory and risk assessment; in Lite Mode, re-check quick-summary. If gaps found, update Phase 1 docs.
 
 > **Lite Mode**: Write only `docs/plan/task-list.md` (flat numbered list with effort estimates and acceptance criteria). Skip to Phase 3.
 
@@ -79,7 +79,7 @@ Write to `docs/plan/`:
 
 ### Phase 3: Progress Tracking Documentation
 
-Create the progress tracking system using templates from `references/doc-templates.md`:
+Create the progress tracking system using the templates defined in the skill's `references/doc-templates.md` (located alongside SKILL.md):
 
 > **Lite Mode**: Create only a simplified MASTER.md with embedded task checklist (no per-phase files).
 
