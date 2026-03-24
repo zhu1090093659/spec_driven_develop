@@ -1,7 +1,7 @@
 {
   "name": "spec-driven-develop",
   "owner": {
-    "name": "zhu1090093659"
+    "name": "jsshwqz"
   },
   "metadata": {
     "description": "Automates pre-development workflow for large-scale complex tasks"
@@ -11,12 +11,12 @@
       "name": "spec-driven-develop",
       "source": "./plugins/spec-driven-develop",
       "description": "Automates pre-development workflow for large-scale complex tasks: project analysis, task decomposition, progress tracking, and sub-SKILL generation. Triggers on keywords like rewrite, migrate, overhaul, refactor, rebuild, or Chinese equivalents.",
-      "version": "1.0.0",
+      "version": "1.2.0",
       "author": {
-        "name": "zhu1090093659"
+        "name": "jsshwqz"
       },
-      "homepage": "https://github.com/zhu1090093659/spec_driven_develop",
-      "repository": "https://github.com/zhu1090093659/spec_driven_develop",
+      "homepage": "https://github.com/jsshwqz/spec_driven_develop",
+      "repository": "https://github.com/jsshwqz/spec_driven_develop",
       "license": "MIT",
       "keywords": ["spec-driven", "workflow", "planning", "task-decomposition", "project-analysis"]
     }
