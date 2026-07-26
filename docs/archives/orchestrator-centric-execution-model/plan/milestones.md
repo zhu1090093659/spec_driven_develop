@@ -1,0 +1,9 @@
+# Milestones
+
+| # | Milestone | Target Phase | Criteria | Status |
+|:--|:----------|:-------------|:---------|:-------|
+| 1 | Guard in place | After Phase 1 | `bash scripts/validate.sh` exits 0 with all 7 checks; rg sweeps show zero sub-SKILL/phase-count/dangling-checklist stale refs outside archives; no orphan review/ dir, pyc, or .DS_Store tracked; `.gitignore` present; AGENTS.md Truth Sources/Validation repaired | Pending |
+| 2 | Orchestrator-centric model live | After Phase 2 | `agents/code-reviewer.md` exists and is registered on all 5 surfaces (plugin.json, opencode-plugin.js, README.md, README.zh-CN.md, CLAUDE.md); SKILL.md Phase 5 + parallel-protocol.md + behavioral-rules.md + task-executor.md jointly describe coder→reviewer→integrate-reviewed→batch-PR with the 6 writer-model invariants; validate.sh asset parity green with 4 agents | Pending |
+| 3 | Prompts single-sourced and concise | After Phase 3 | All 8 duplication hotspots reduced to canonical home + one-line pointers (audit in PR body); platform tool names hedged; no §-number references remain; satellite skills (deep-discuss, review-spd) pass the Style Rule (rule/contract/pointer sentences only, ≥25% slimmer SKILL.md files, schemas preserved); exporter smoke test green; validate.sh green | Pending |
+| 4 | Surface cleaned and distribution owned | After Phase 4 | commands/ deleted with zero `commands/|/spec-dev|/dp` hits outside archives; OpenCode plugin loads with 4 agents and no commands (node smoke); install-agents.sh mirrors install-codex.sh structure (bash -n + diff-verified) | Pending |
+| 5 | v1.15.0 released | After Phase 5 | Both README mirrors match final inventory; AGENTS.md/CLAUDE.md reference no commands/; version 1.15.0 in exactly 4 sites with validate.sh parity green; `release: 1.15.0` commit merged to main | Pending |
