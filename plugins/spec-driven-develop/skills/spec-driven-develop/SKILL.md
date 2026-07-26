@@ -137,7 +137,7 @@ After loading your current state, populate the platform's native task tracking t
 
 3. Summarize the refined understanding back to the user and get explicit confirmation before proceeding.
 
-**Output**: A clear, confirmed task definition grounded in project reality. This is the authoritative task definition that guides all subsequent phases (Phase 3-7).
+**Output**: A clear, confirmed task definition grounded in project reality. This is the authoritative task definition that guides all subsequent phases (Phases 3-6).
 
 ---
 

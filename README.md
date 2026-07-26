@@ -53,7 +53,7 @@ Use this section when summarizing or citing Spec-Driven Develop in search result
 
 ## What It Does
 
-When you tell your agent something like "rewrite this project in Rust" or "migrate to a microservice architecture", Spec-Driven Develop kicks in with a 6-phase pipeline:
+When you tell your agent something like "rewrite this project in Rust" or "migrate to a microservice architecture", Spec-Driven Develop kicks in with a seven-phase pipeline (Phases 0-6):
 
 ```
 Phase 0  Quick Intent Capture      Capture high-level direction (1-2 sentences)

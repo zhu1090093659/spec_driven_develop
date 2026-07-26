@@ -9,7 +9,7 @@ TARGET_SKILLS_DIR="$CODEX_HOME/skills"
 TARGET_DIR="$TARGET_SKILLS_DIR/$SKILL_NAME"
 SKILLS_SUBPATH="plugins/spec-driven-develop/skills"
 SKILL_SUBPATH="$SKILLS_SUBPATH/$SKILL_NAME"
-BUNDLED_SKILLS=("spec-driven-develop" "deep-discuss" "review" "review-spd")
+BUNDLED_SKILLS=("spec-driven-develop" "deep-discuss" "review-spd")
 
 # Extract version from SKILL.md frontmatter
 extract_version() {

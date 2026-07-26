@@ -26,7 +26,7 @@
   "interface": {
     "displayName": "Spec-Driven Develop",
     "shortDescription": "Architecture-first planning, deep discussion, and findings-first code review for AI coding agents.",
-    "longDescription": "Spec-Driven Develop adds three Markdown-based workflows for Codex: a six-phase development pipeline for large project transformations (analysis, planning, project governance, tracking, and execution), Deep Discuss for disciplined problem analysis and solution design, and Review SPD for bug-focused code review of uncommitted changes, date-range commits, and branch/PR diffs.",
+    "longDescription": "Spec-Driven Develop adds three Markdown-based workflows for Codex: a seven-phase development pipeline (Phases 0-6) for large project transformations (analysis, planning, project governance, tracking, and execution), Deep Discuss for disciplined problem analysis and solution design, and Review SPD for bug-focused code review of uncommitted changes, date-range commits, and branch/PR diffs.",
     "developerName": "zhu1090093659",
     "category": "Productivity",
     "capabilities": [
