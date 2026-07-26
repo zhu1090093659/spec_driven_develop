@@ -1,140 +1,113 @@
 # Adaptive Control Protocol
 
-This protocol introduces closed-loop feedback control into the Spec-Driven Develop workflow. It defines how execution telemetry is collected, how plan-vs-reality drift is measured, and what automatic corrective actions are taken when drift exceeds thresholds.
+Closed-loop feedback control for the Spec-Driven Develop workflow: how execution telemetry is collected, how plan-vs-reality drift is measured, and what automatic corrective actions fire when drift exceeds thresholds.
 
 ---
 
 ## Core Concepts
 
-The workflow is modeled as a **closed-loop control system**:
-
 | Control Theory Concept | Workflow Mapping |
 |:-----------------------|:-----------------|
-| **Plant** (被控对象) | The codebase under transformation |
-| **Set point** (目标) | Phase 2 confirmed task definition + S.U.P.E.R principles |
-| **Controller** | The SKILL workflow (Phases 0-6) + this adaptive protocol |
-| **Actuator** | Delivery batch executors and lane workers (sequential or parallel) |
+| **Plant** | The codebase under transformation |
+| **Set point** | Phase 2 confirmed task definition + S.U.P.E.R principles |
+| **Controller** | The SKILL workflow (Phases 0-6) + this protocol |
+| **Actuator** | Delivery batch executors and lane workers |
 | **Sensor** | Post-task telemetry collection |
 | **Error signal** | `drift_score` — cumulative plan-vs-reality deviation |
 
 ---
 
-## 1. Execution Observer — Telemetry Collection
+## Telemetry Collection
 
-After completing every task and BEFORE marking it as done, the agent MUST collect three signals:
+After completing every task and BEFORE marking it as done, collect three signals.
 
-### 1.1 Actual Effort
+### Actual Effort
 
-Compare estimated effort (from `task-breakdown.md`) against actual effort:
+Compare estimated effort (from `task-breakdown.md`) against actual:
 
 | Level | Criteria |
 |:------|:---------|
 | S | Completed in < 30 minutes, no unexpected issues |
 | M | 30 min – 2 hours, minor surprises |
 | L | 2 – 4 hours, or significant unexpected complexity |
-| XL | > 4 hours, or required fundamental re-thinking of approach |
+| XL | > 4 hours, or required fundamental re-thinking |
 
-Record the **effort delta** as the number of levels between estimated and actual:
-- Estimated M, Actual M → delta = 0
-- Estimated S, Actual L → delta = +2
-- Estimated L, Actual M → delta = -1
+Record the **effort delta** as levels between estimated and actual (estimated M / actual M → 0; S → L → +2; L → M → -1).
 
-### 1.2 S.U.P.E.R Score Delta
+### S.U.P.E.R Score Delta
 
-Run the S.U.P.E.R Code Review Checklist (10 checks) defined in `super-philosophy.md` § "S.U.P.E.R Code Review Checklist (10 checks)". Compare the pass count against the task's baseline expectation:
-- If the task's S.U.P.E.R drivers indicated it should improve specific principles, and the checklist shows improvement → delta = positive
-- If the checklist shows no improvement where improvement was expected → delta = 0 (counts as deviation)
-- If the checklist shows regression → delta = negative
+Run the 10-check checklist in `super-philosophy.md` § "S.U.P.E.R Code Review Checklist (10 checks)". Record `super_score` (passes out of 10) and `super_delta` (change vs. pre-task state). No improvement where the task's S.U.P.E.R drivers promised improvement → delta = 0 (counts as deviation); regression → negative.
 
-Simplified scoring: count passes out of 10. Record `super_score` (0-10) and `super_delta` (change vs. pre-task state).
+### Unplanned Dependencies
 
-### 1.3 Unplanned Dependencies
-
-Count the number of dependencies discovered during execution that were NOT listed in the task's "Dependencies" field in `task-breakdown.md`. This includes:
-- Files that needed modification but weren't listed in "Affected Files"
-- Tasks that should have been prerequisites but weren't identified
-- External libraries or APIs that needed changes
+Count dependencies discovered during execution that were NOT in the task's "Dependencies" field: unlisted files modified, unidentified prerequisite tasks, external libraries/APIs that needed changes.
 
 ---
 
-## 2. Deviation Evaluator — Drift Score Calculation
+## Drift Score Calculation
 
-### 2.1 Per-Task Drift Contribution
-
-Each completed task contributes to `drift_score` based on:
+### Per-Task Drift Contribution
 
 ```
 task_drift = max(0, effort_delta) + (1 if super_delta <= 0 AND task had SUPER drivers else 0) + min(unplanned_deps, 2)
 ```
 
-- `effort_delta`: only positive deltas count (underestimates are deviation; overestimates are not)
-- S.U.P.E.R stagnation: +1 if a task that was supposed to improve S.U.P.E.R scores didn't
-- Unplanned deps: capped at 2 per task to prevent single outlier from dominating
+Only positive effort deltas count. Unplanned deps are capped at 2 per task.
 
-### 2.2 Cumulative Drift Score
+### Cumulative Drift Score
 
 ```
 drift_score = sum of all task_drift values for completed tasks
 ```
 
-### 2.3 Percentage-Based Thresholds
+### Percentage-Based Thresholds
 
-Thresholds are calculated relative to the **total number of tasks in the current phase**:
+Relative to the **total task count of the current phase**, computed once at phase start:
 
 ```
-threshold_annotate = ceil(total_tasks * 0.20)  # 20% — mild adjustment
-threshold_replan   = ceil(total_tasks * 0.40)  # 40% — re-decompose remaining tasks
-threshold_rescope  = ceil(total_tasks * 0.60)  # 60% — re-evaluate scope with user
+threshold_annotate = ceil(total_tasks * 0.20)
+threshold_replan   = ceil(total_tasks * 0.40)
+threshold_rescope  = ceil(total_tasks * 0.60)
 ```
-
-For example, a phase with 10 tasks: annotate at drift ≥ 2, replan at drift ≥ 4, rescope at drift ≥ 6.
-
-Thresholds are computed once at phase start (when total task count is known) and stored in the adaptive state.
 
 ---
 
-## 3. Strategy Adjuster — Automatic Response Actions
+## Automatic Response Actions
 
-### 3.1 Level 1: Annotate (drift ≥ threshold_annotate)
+### Annotate (drift ≥ threshold_annotate)
 
-**Trigger**: Mild deviation detected. Plan is still viable but needs attention.
+Mild deviation; plan still viable. Automatically:
 
-**Automatic actions**:
-1. Add label `⚠️-drift-warning` to the next pending Issue (GitHub modes)
-2. Post a comment on the next pending Issue:
+1. Add label `⚠️-drift-warning` to the next pending Issue (GitHub modes).
+2. Comment on the next pending Issue:
    ```
    ⚠️ Adaptive Control Notice: drift_score={n}/{threshold_replan}.
    Previous tasks ran harder than estimated. Expect higher complexity.
    Adjust time expectations for this task accordingly.
    ```
-3. In LOCAL_ONLY mode: append a warning line to the next task's entry in the phase file
-4. Update the adaptive state (see § 4)
+3. LOCAL_ONLY: append a warning line to the next task's entry in the phase file.
+4. Update the adaptive state (§ "Adaptive State Storage").
 
-### 3.2 Level 2: Replan (drift ≥ threshold_replan)
+### Replan (drift ≥ threshold_replan)
 
-**Trigger**: Significant deviation. The remaining task decomposition is likely inaccurate.
+Significant deviation; remaining decomposition is likely inaccurate. Automatically:
 
-**Automatic actions**:
-1. **HALT current execution** — do not start the next task
+1. **HALT** — do not start the next task.
 2. Post a summary Issue comment or annotation:
    ```
    🔄 Adaptive Control: Replanning triggered (drift_score={n}).
    Remaining tasks will be re-decomposed based on execution learnings.
    ```
-3. Close all remaining unstarted Issues with label `superseded-by-replan` and reason `not_planned` (GitHub modes)
-4. **Re-enter Phase 3** (Task Decomposition) for the remaining scope only:
-   - Use completed task telemetry as input (actual effort levels inform new estimates)
-   - Preserve completed tasks and their Issues — only re-plan what's left
-   - Create new Issues for the re-decomposed tasks under the same Milestone
-5. Reset `drift_score` to 0 for the re-planned segment
-6. In LOCAL_ONLY mode: archive old phase file entries and create new ones
+3. Close all remaining unstarted Issues with label `superseded-by-replan`, reason `not_planned` (GitHub modes).
+4. **Re-enter Phase 3** for the remaining scope only, using completed-task telemetry as estimation input; preserve completed tasks/Issues; create new Issues under the same Milestone.
+5. Reset `drift_score` to 0 for the re-planned segment.
+6. LOCAL_ONLY: archive old phase file entries and create new ones.
 
-### 3.3 Level 3: Rescope (drift ≥ threshold_rescope)
+### Rescope (drift ≥ threshold_rescope)
 
-**Trigger**: Severe deviation. The original scope or strategy may be fundamentally wrong.
+Severe deviation; scope or strategy may be fundamentally wrong. Automatically:
 
-**Automatic actions**:
-1. **HALT current execution**
+1. **HALT**.
 2. Create a dedicated Issue titled `🔄 Scope Re-evaluation Required`:
    ```
    ## Adaptive Control: Scope Re-evaluation
@@ -153,20 +126,18 @@ Thresholds are computed once at phase start (when total task count is known) and
    The current scope/strategy appears misaligned with project reality.
    Returning to Phase 2 for scope confirmation with the user.
    ```
-3. Add label `blocked:replan` to all in-progress Issues
-4. **Re-enter Phase 2** (Intent Refinement) with accumulated execution data as context
-5. After user re-confirms scope, re-enter Phase 3 to re-decompose all remaining work
-6. In LOCAL_ONLY mode: same flow but using MASTER.md annotations
+3. Add label `blocked:replan` to all in-progress Issues.
+4. **Re-enter Phase 2** with accumulated execution data as context.
+5. After user re-confirms scope, re-enter Phase 3 for all remaining work.
+6. LOCAL_ONLY: same flow using MASTER.md annotations.
 
 ---
 
-## 4. Adaptive State Storage
+## Adaptive State Storage
 
-### 4.1 GitHub Modes (GITHUB_FULL / GITHUB_STANDARD)
+### GitHub Modes (GITHUB_FULL / GITHUB_STANDARD)
 
-**Primary storage**: Milestone description (appended YAML block)
-
-After creating a Milestone in Phase 3, append this block to its description:
+**Primary storage**: Milestone description (appended YAML block), written at Milestone creation in Phase 3:
 
 ```yaml
 ---
@@ -183,20 +154,19 @@ adaptive:
   last_updated: "<ISO-8601>"
 ```
 
-**Update command** (replace the YAML block in Milestone description):
+**Update command** (replace the YAML block in the description):
+
 ```bash
-# Read current description
 DESC=$(gh api repos/{owner}/{repo}/milestones/{number} --jq '.description')
-# Update the adaptive block (using sed or script)
-# Write back
+# update the adaptive block, then:
 gh api repos/{owner}/{repo}/milestones/{number} -X PATCH -f description="$NEW_DESC"
 ```
 
-**Per-task telemetry**: Stored as structured Issue comments (see § 4.3).
+**Per-task telemetry**: structured Issue comments (format below).
 
-### 4.2 LOCAL_ONLY Mode
+### LOCAL_ONLY Mode
 
-**Primary storage**: `docs/progress/MASTER.md` — dedicated "Adaptive Control State" section:
+**Primary storage**: `docs/progress/MASTER.md` — "Adaptive Control State" section:
 
 ```markdown
 ## Adaptive Control State
@@ -218,9 +188,9 @@ gh api repos/{owner}/{repo}/milestones/{number} -X PATCH -f description="$NEW_DE
 |---------|------|--------|----------|-------------|---------|----------------|------------|
 ```
 
-### 4.3 Issue Telemetry Comment Format (GitHub Modes)
+### Issue Telemetry Comment Format (GitHub Modes)
 
-When a task is implementation-complete, post this structured comment on its Issue before the delivery batch PR can close it. Telemetry remains per task/Issue even when one PR covers several Issues. An Issue may stay open in `awaiting batch PR` or `in review` state after telemetry is recorded; do not create a task-level PR merely to close it.
+Post this on the Issue when its task is implementation-complete, before the delivery batch PR closes it. Telemetry stays per task/Issue even when one PR covers several Issues. An Issue may stay open in `awaiting batch PR` / `in review` state after telemetry; do not create a task-level PR merely to close it.
 
 ```markdown
 ## 📊 Execution Telemetry
@@ -238,52 +208,46 @@ When a task is implementation-complete, post this structured comment on its Issu
 
 ---
 
-## 5. Controller Activation
+## Controller Activation
 
-### 5.1 Session Start (Cross-Conversation Continuity)
+### Session Start
 
 At the start of every conversation, AFTER reading MASTER.md:
 
-1. Read the active Milestone's adaptive state:
-   - GitHub modes: `gh api repos/{owner}/{repo}/milestones/{number} --jq '.description'`
-   - LOCAL_ONLY: read from MASTER.md "Adaptive Control State" section
-2. Parse `drift_score` and thresholds
-3. **Evaluate**: If `drift_score` already exceeds a threshold (from a previous session), trigger the appropriate response BEFORE executing any new task
-4. Report the adaptive state in the session's opening status
+1. Read the active Milestone's adaptive state (GitHub: `gh api repos/{owner}/{repo}/milestones/{number} --jq '.description'`; LOCAL_ONLY: MASTER.md "Adaptive Control State").
+2. Parse `drift_score` and thresholds.
+3. If `drift_score` already exceeds a threshold (from a previous session), trigger the response BEFORE executing any new task.
+4. Report the adaptive state in the session's opening status.
 
-### 5.2 Post-Task (Inline During Execution)
+### Post-Task
 
 For sequential execution, after every task completion:
 
-1. Collect telemetry (§ 1)
-2. Calculate task drift contribution (§ 2.1)
-3. Calculate the new cumulative `drift_score` (§ 2.2)
-4. Persist the updated Milestone adaptive state / MASTER.md (§ 4)
-5. Write telemetry to the Issue / MASTER.md using the updated cumulative score (§ 4)
-6. **Evaluate**: Check drift_score against thresholds (§ 3)
-7. If threshold exceeded → execute response action BEFORE starting next task
-8. If no threshold exceeded → proceed to next task
+1. Collect telemetry (§ "Telemetry Collection").
+2. Calculate task drift contribution and new cumulative `drift_score` (§ "Drift Score Calculation").
+3. Persist the updated adaptive state (§ "Adaptive State Storage").
+4. Write telemetry to the Issue / MASTER.md using the updated cumulative score.
+5. If a threshold is exceeded → execute the response BEFORE the next task; otherwise proceed.
 
-For parallel lanes, lane executors perform steps 1-2 and return per-task telemetry, but do not perform steps 3-7. The orchestrator records and applies those contributions once in § 5.3, preventing duplicate increments and concurrent MASTER.md/Milestone writes.
+For parallel lanes, lane executors perform steps 1-2 and return per-task telemetry, but never steps 3-5 — the orchestrator records and applies contributions once per batch, preventing duplicate increments and concurrent state writes.
 
-### 5.3 Post-Delivery-Batch Integration
+### Post-Delivery-Batch Integration
 
-After consolidating all sequential or parallel work in a delivery batch:
+After consolidating all work in a delivery batch:
 
-1. Collect any lane telemetry not yet recorded by § 5.2
-2. Add the sum of only those unrecorded task contributions to cumulative `drift_score` once, then persist the adaptive state
-3. Write each unrecorded task's telemetry to its Issue / MASTER.md using that updated post-batch cumulative score
-4. Verify that telemetry exists for every Issue the batch PR will close
-5. Evaluate thresholds against the resulting cumulative score
-6. If a threshold is exceeded → trigger the response before starting the next delivery batch
+1. Collect any lane telemetry not yet recorded.
+2. Add the sum of only those unrecorded contributions to `drift_score` once; persist.
+3. Write each unrecorded task's telemetry to its Issue / MASTER.md using the post-batch cumulative score.
+4. Verify telemetry exists for every Issue the batch PR will close.
+5. If a threshold is exceeded → trigger the response BEFORE the next delivery batch.
 
 ---
 
-## 6. Interaction with Existing Workflow
+## Workflow Integration
 
 | Workflow Phase | Adaptive Control Integration |
 |:---------------|:-----------------------------|
-| Phase 3 (Decomposition) | Initialize adaptive state in Milestone description. Compute thresholds. |
-| Phase 4 (Progress Tracking) | MASTER.md template includes telemetry section (LOCAL_ONLY) or telemetry reference (GitHub modes) |
-| Phase 5 (Confirm & Execute) | Every task completion triggers § 5.2. Every delivery batch integration triggers § 5.3 before its PR closes Issues. |
-| Phase 6 (Archive) | Archive includes final telemetry summary and drift history as execution retrospective. |
+| Phase 3 (Decomposition) | Initialize adaptive state in Milestone descriptions; compute thresholds. |
+| Phase 4 (Progress Tracking) | MASTER.md includes the telemetry section (LOCAL_ONLY) or a telemetry reference (GitHub modes). |
+| Phase 5 (Confirm & Execute) | Every task completion triggers "Post-Task"; every batch integration triggers "Post-Delivery-Batch Integration" before its PR closes Issues. |
+| Phase 6 (Archive) | Archive includes the final telemetry summary and drift history as retrospective. |
