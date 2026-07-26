@@ -305,6 +305,7 @@ Do not create competing truth sources. The workflow must leave behind a clear ma
    - Delivery batch overview with planned PR count and any split rationales (from Phase 3)
    - **Tracking mode** and what it means for the execution workflow
    - Progress tracking system description (from Phase 4)
+   - Execution model: tiered dispatch (orchestrator-direct by default; `task-executor` coders and `code-reviewer` reviewers dispatched per the admission criteria in `references/parallel-protocol.md`)
 
 2. List all generated artifacts:
    - `docs/analysis/project-overview.md`
@@ -327,32 +328,39 @@ After user confirmation, execute tasks according to the plan:
 
 1. **Process each phase sequentially** (Phase 1 → Phase 2 → ... in the plan's phased order). Before editing, read every open Issue in the phase and revalidate the planned delivery batches against current dependencies, affected files, review scope, and repository rules. If the mapping must change, update `task-breakdown.md`, MASTER.md, and the `Delivery Batch` field in every affected GitHub Issue body; comment the regrouping reason so all execution surfaces agree.
 
-2. **Process delivery batches in dependency order**:
-   - For a batch with **parallel lanes**: execute dependency-ready lanes in waves. Launch only lanes whose prerequisites are integrated, one `task-executor` per ready lane in isolated worktrees. Give every agent the full batch context plus its assigned task IDs and Issue numbers. Lane agents implement and commit their assigned work but do not create PRs. See `references/parallel-protocol.md`.
-   - For a batch with **one lane**: execute the included tasks together on the batch integration branch, or delegate the complete batch to one `task-executor` agent.
-   - Follow the repository's branch convention; otherwise use `batch/{batch_id}-{slug}` for the integration branch and `work/{batch_id}-{lane_id}-{slug}` for lane branches.
+2. **Choose the execution tier for each delivery batch.** Sub-agent dispatch is an economic decision, not a default: dispatch only when parallelism gain and context-isolation value exceed the sub-agent cold-start tax and orchestration overhead. The full admission criteria live in `references/parallel-protocol.md`.
+   - **Tier 0 — orchestrator-direct (default)**: S/M effort, few files, context already held, or machine-verifiable acceptance. Execute the batch's tasks yourself, directly on the batch integration branch. No sub-agents, no worktrees.
+   - **Tier 1 — single coder**: L/XL task bundles or context-heavy exploration. Delegate the complete batch to one `task-executor` agent.
+   - **Tier 2 — parallel lanes**: only when lanes have disjoint file sets, each lane is ≥ L effort, each is independently verifiable, and there are ≤ 4 lanes. Launch one `task-executor` per dependency-ready lane in isolated worktrees, in waves. Give every agent the full batch context plus its assigned task IDs and Issue numbers. Lane agents implement and commit their assigned work but do not create PRs. See `references/parallel-protocol.md`.
+   - Follow the repository's branch convention; otherwise use `batch/{batch_id}-{slug}` for the integration branch and `work/{batch_id}-{lane_id}-{slug}` for lane branches (lane branches exist only for Tier 2).
 
-3. **After each task completion** — follow the adaptive control protocol (`references/adaptive-control.md` § 5.2):
+3. **Review before integrating.** Apply the cheapest review level that matches the risk:
+   - **L1 — machine validation (always)**: run every task's targeted acceptance checks plus the batch's combined validation.
+   - **L2 — orchestrator diff review (default)**: personally read the diff against every included Issue's acceptance criteria. You hold the context — this is cheap and catches most issues.
+   - **L3 — independent reviewer (reserved)**: dispatch one `code-reviewer` agent per lane for high-risk work — contract/port format changes, logic code, cross-surface semantic invariants — and for every Tier 2 parallel lane. The reviewer verifies the lane's diff against its per-task acceptance criteria, commits fixes directly to the lane branch (append-only `fix:` commits that reference but never close Issues), and returns a Review Report with verdict APPROVED | FIXED | ESCALATE. Integrate only lanes whose verdict is APPROVED or FIXED; resolve ESCALATE yourself, with the user when needed.
+   - Writer model: reviewers never write GitHub Issues/PRs, MASTER.md, drift state, or instruction/memory surfaces. You remain the acceptance-verification authority (reviewer reports assist; you decide) and the single writer for all shared state.
+
+4. **After each task completion** — follow the adaptive control protocol (`references/adaptive-control.md` § 5.2):
    - Collect telemetry: actual effort, S.U.P.E.R score, unplanned dependencies
    - Calculate task drift contribution and update cumulative `drift_score`
    - Write telemetry to Issue comment (GitHub modes) or MASTER.md (LOCAL_ONLY)
    - Check drift thresholds — if exceeded, execute the automatic response action (annotate/replan/rescope)
-   - For parallel lanes, executors return per-task telemetry and the orchestrator records it once during batch integration; lane agents do not race to update shared state.
+   - For parallel lanes, executors and reviewers return per-task telemetry and the orchestrator records it once during batch integration; lane agents do not race to update shared state.
 
-4. **Integrate and validate each delivery batch**:
-   - Consolidate lane branches onto the batch integration branch and reconcile overlapping changes.
+5. **Integrate and validate each delivery batch**:
+   - Consolidate reviewed lane branches onto the batch integration branch and reconcile overlapping changes.
    - Run per-task checks plus the batch's combined validation and post-integration architecture checks.
-   - Verify every included Issue's acceptance criteria. Keep incomplete Issues out of the PR's closing keywords.
+   - Verify every included Issue's acceptance criteria yourself (L2). Keep incomplete Issues out of the PR's closing keywords.
    - In GitHub modes, create one PR for the batch. Map each completed Issue to its changes and tests, and add one `Closes #N` line per completed Issue. Do not create task-level PRs as an intermediate step.
    - Immediately after PR creation, write the PR number and `in review` state to the batch row and every fully completed Issue row in MASTER.md. Keep partially covered Issues open with an explicit partial status and PR reference.
    - A single-Issue PR is allowed only for a documented batch exception or a phase that contains one Issue.
 
-5. **Progress updates**:
+6. **Progress updates**:
    - **GitHub modes**: the merged batch PR auto-closes all Issues named by its `Closes #N` lines. Update MASTER.md's "Current Status", "Issue Mapping", and "Delivery Batches" sections.
    - **LOCAL_ONLY**: Check off tasks in phase files, update counts in MASTER.md.
    - **All modes**: If the task produced durable engineering knowledge, update the resolved native memory surface or explicitly selected fallback; if it changed how future agents must work in the repo, update the resolved instruction surfaces.
 
-6. **When all tasks are complete** (all Issues closed or all checkboxes checked): proceed to Phase 6 (Archive).
+7. **When all tasks are complete** (all Issues closed or all checkboxes checked): proceed to Phase 6 (Archive).
 
 **Output**: All planned tasks implemented and verified.
 
