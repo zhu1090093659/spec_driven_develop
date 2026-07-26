@@ -26,22 +26,7 @@ Justify your choice based on the project's specific characteristics.
 
 ### 2. Phase Design
 
-Break the work into sequential phases. Each phase should:
-- Have a clear, testable goal
-- Be completable independently (the project should be in a working state after each phase)
-- Build on the previous phase's output
-- Take a reasonable amount of effort (not too granular, not too coarse)
-
-Typical phase patterns:
-- Phase 1: Project setup and infrastructure (build system, CI, dependencies)
-- Phase 2: Core/shared libraries and utilities
-- Phase 3: Data layer (models, storage, serialization)
-- Phase 4: Business logic layer
-- Phase 5: API/Interface layer
-- Phase 6: Integration and end-to-end testing
-- Phase 7: Migration tooling and data migration (if applicable)
-
-Adapt this to the specific project — not all phases apply to every transformation.
+Break the work into sequential phases. Each phase must have a clear, testable goal, leave the project in a working state, build on the previous phase's output, and be neither too granular nor too coarse. Adapt the phase count and boundaries to the specific project — fix S.U.P.E.R violation hotspots and foundations early.
 
 ### 3. Task Definition
 
@@ -79,7 +64,7 @@ For each lane:
 - **Estimated time**: Combined effort of the lane (determines wall-clock time for the phase)
 - **Merge risk**: Low / Medium / High — likelihood of merge conflicts between lanes (based on file overlap)
 
-The goal is to minimize wall-clock time per phase. If a phase has 4 tasks and 2 are independent, they form 2 parallel lanes — cutting phase duration roughly in half.
+The goal is to minimize wall-clock time per phase.
 
 ### 6. Delivery Batch Design
 
@@ -108,10 +93,7 @@ Lane workers never create PRs. The orchestrator integrates their commits and cre
 
 ### 7. Milestone Definition
 
-Define milestones at natural phase boundaries. Each milestone should represent a meaningful achievement:
-- "Core library compiled and passing unit tests"
-- "API layer serving all endpoints with feature parity"
-- "Full integration test suite green"
+Define milestones at natural phase boundaries. Each milestone represents one meaningful, verifiable achievement (e.g., a core library compiling with green unit tests, an API layer at feature parity).
 
 ## Output Format
 

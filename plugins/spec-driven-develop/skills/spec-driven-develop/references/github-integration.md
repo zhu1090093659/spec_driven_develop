@@ -250,7 +250,7 @@ Follow the repository's branch convention. If none exists, use:
 
 For a one-lane batch, work directly in one isolated worktree on the integration branch. For a genuinely parallel batch, execute dependency-ready lanes in waves. Create each wave's lane worktrees from the current integration base; integrate prerequisite commits before branching downstream waves. Every lane receives the complete batch context and its assigned Issue subset.
 
-Or, if the platform provides a native worktree tool (e.g., Claude Code's `EnterWorktree`), use that instead.
+If the platform provides a native worktree tool, use it according to that platform's documentation instead of manual worktree management.
 
 ### 3. Implement and Commit Without Creating PRs
 

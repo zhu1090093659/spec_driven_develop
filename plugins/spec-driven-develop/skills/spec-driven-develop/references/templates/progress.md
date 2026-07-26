@@ -2,6 +2,13 @@
 
 Templates for the tracking documents generated in Phase 4 (Progress Tracking Documentation). Output to `docs/progress/`. Choose the template that matches the detected tracking mode.
 
+> **FORMAT FREEZE**: `scripts/export-progress.py` parses these files by regular expression. The following patterns are load-bearing ports — change them only together with the exporter:
+>
+> - Title line `# <Task Name> -- Progress Tracker` (the `--` separator must be ASCII hyphens, never an em-dash)
+> - Blockquote fields `> **Started**: ...` / `> **Last Updated**: ...`
+> - Phase checklist `- [ ] Phase N: <name> (0/N tasks)`
+> - Phase-file task entries `- [ ] **Task N.M**: ...` with `- Priority:`, `- Effort:`, `- Acceptance:` sub-fields
+
 ---
 
 ## MASTER.md — GitHub Mode (GITHUB_FULL / GITHUB_STANDARD)
@@ -9,7 +16,7 @@ Templates for the tracking documents generated in Phase 4 (Progress Tracking Doc
 Use this template when the tracking mode is `GITHUB_FULL` or `GITHUB_STANDARD`. MASTER.md serves as a lightweight local index pointing to GitHub resources. Actual task status lives in GitHub Issues.
 
 ```markdown
-# [Task Name] — Progress Tracker
+# [Task Name] -- Progress Tracker
 
 > **Task**: One-line description
 > **Started**: YYYY-MM-DD
@@ -106,7 +113,7 @@ gh pr list -R {repo} --state open --search "in:title Batch" --json number,title,
 Use this template when the tracking mode is `LOCAL_ONLY`. This is the original full-fidelity progress tracking format.
 
 ```markdown
-# [Task Name] — Progress Tracker
+# [Task Name] -- Progress Tracker
 
 > **Task**: One-line description
 > **Started**: YYYY-MM-DD

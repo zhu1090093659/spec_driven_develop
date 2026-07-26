@@ -10,46 +10,33 @@ version: 1.0.1
 
 # Review SPD
 
-You are executing the **Review SPD** workflow: a findings-first code review process for changed code. Your primary goal is to identify bugs, regressions, and behavior risks introduced by the changes. Do not turn this into a style review or a broad summary.
+You are executing the **Review SPD** workflow: a findings-first review of changed code. Identify bugs, regressions, and behavior risks introduced by the changes. Do not turn this into a style review or a broad summary.
 
 ## Configuration
 
 | Item | Default | Purpose |
 |:-----|:--------|:--------|
-| Context script | `scripts/review-context.py` relative to this Review SPD skill directory | Collect stable git context for review targets |
-| Default target | Uncommitted changes | Review working tree and staged changes by default |
-| Commit range default | Last 3 days | Used only when the user explicitly requests commit/date review without dates |
+| Context script | `scripts/review-context.py` relative to this Review SPD skill directory | Collect stable git context |
+| Default target | Uncommitted changes | Working tree + staged changes |
+| Commit range default | Last 3 days | Only when the user requests commit/date review without dates |
 | PR base | Auto-detect `origin/main`, `origin/master`, then remote default branch | Base for branch-vs-main review |
-| Output style | Findings first | Findings ordered by severity before summaries or notes |
+| Output style | Findings first | Findings by severity before summaries |
 
-References:
-
-- Reviewer sub-agent template: `references/reviewer-template.md`
-- Final output format: `references/output-format.md`
+References: reviewer sub-agent template `references/reviewer-template.md`; final output format `references/output-format.md`.
 
 ## Target Modes
 
-The workflow supports three mutually exclusive review targets:
+Three mutually exclusive targets:
 
-1. **Uncommitted mode**: Review current uncommitted changes. This is the default.
-2. **Commit-range mode**: Review commits in a date range. If the user explicitly asks for commit/date review but gives no range, use the last 3 days.
-3. **Branch / PR mode**: Review a branch compared with the main branch or an explicit base branch.
+1. **Uncommitted mode** (default)
+2. **Commit-range mode** — no explicit range → last 3 days
+3. **Branch / PR mode** — branch vs. main or explicit `base`
 
-Resolve target conflicts with this priority:
-
-1. If `branch` is specified, use branch / PR mode.
-2. Else if `since` or `until` is specified, use commit-range mode.
-3. Else use uncommitted mode.
-
-`base` only applies to branch / PR mode.
+Conflict priority: `branch` specified → branch mode; else `since`/`until` → commit-range mode; else uncommitted. `base` applies only to branch mode. Vague requests ("review this") → uncommitted mode; "recent commits" without dates → `--since "3 days ago"`.
 
 ## Phase 1: Target Resolution
 
-Extract the review target from the user's request.
-
-Examples:
-
-Resolve the context script from the installed Review SPD skill directory, not from the repository being reviewed. Use the packaged script path in commands, for example:
+Resolve the context script from the installed Review SPD skill directory, not from the repository being reviewed:
 
 ```bash
 python <review-spd-skill-dir>/scripts/review-context.py
@@ -61,79 +48,61 @@ python <review-spd-skill-dir>/scripts/review-context.py --branch feature/foo --b
 
 When reviewing this repository itself, the convenience wrapper `scripts/review-context.py` is also available.
 
-If the user gives a vague request such as "review this", use uncommitted mode. If the user asks for "recent commits" without dates, use commit-range mode with `--since "3 days ago"`.
-
 ## Phase 2: Context Collection
 
-Run the packaged context script while your current working directory is the repository being reviewed. The script changes into that repository's git root before collecting context. It only collects git context; it does not decide whether code is correct.
+Run the script with cwd = the repository under review (it cd's to the git root itself). The script only collects git context; it does not judge correctness. From its output identify: review mode and base/head, commit list (if any), changed files and diff stats, added/deleted/renamed files, and the unified diff hunks needing semantic review.
 
-Read the generated context and identify:
-
-- Review mode and base/head information
-- Commit list, if applicable
-- Changed files and diff stats
-- Added, deleted, renamed, and modified files
-- Unified diff sections that need semantic review
-
-If the script reports no changes, stop and say there is nothing to review for the selected target. Do not invent findings.
+If the script reports no changes, stop and say there is nothing to review. Do not invent findings.
 
 ## Phase 3: Review Planning
 
-Classify the review size before spawning reviewers:
+Classify review size:
 
-- **Small**: up to 3 changed files or a small localized diff. Cover Correctness and Tests.
-- **Medium**: multiple files or behavior-affecting changes. Cover Correctness, Regression/Compatibility, and Tests.
-- **Large or high-risk**: broad changes, auth/permissions, persistence, migrations, concurrency, caching, money, security, public APIs, generated code, or config/deployment changes. Add Security/Data Safety and Performance/Concurrency.
+- **Small** (≤3 files, localized diff): cover Correctness + Tests.
+- **Medium** (multiple files / behavior-affecting): add Regression/Compatibility.
+- **Large or high-risk** (broad changes, auth/permissions, persistence, migrations, concurrency, caching, money, security, public APIs, generated code, config/deployment): add Security/Data Safety + Performance/Concurrency.
 
-Prioritize behavior code, public contracts, data handling, error paths, configuration, persistence, and tests. Deprioritize pure documentation, formatting-only changes, generated files, and lockfile churn unless they affect runtime behavior.
+Prioritize behavior code, public contracts, data handling, error paths, configuration, persistence, tests. Deprioritize docs, formatting-only changes, generated files, lockfile churn unless they affect runtime behavior.
 
 ## Phase 4: Sub-Agent Review
 
-If the current platform supports native sub-agents, task agents, or parallel agents, spawn focused reviewers using `references/reviewer-template.md`. If not, perform the same focused reviews sequentially yourself. Lack of sub-agent support must not reduce review coverage.
+If the platform supports sub-agents, spawn focused reviewers using `references/reviewer-template.md`; otherwise perform the same focused reviews sequentially yourself. Coverage must not shrink without sub-agents.
 
-Recommended reviewer focuses:
+Reviewer focuses:
 
 - **Correctness / Bug Risk**: logic errors, edge cases, state consistency, exception paths, invalid assumptions.
-- **Regression / Compatibility**: changed API contracts, config behavior, data formats, migrations, CLI behavior, backward compatibility where relevant.
+- **Regression / Compatibility**: changed API contracts, config behavior, data formats, migrations, CLI behavior, backward compatibility.
 - **Tests / Verification**: missing tests for changed behavior, weak assertions, stale tests, untested failure modes.
 - **Security / Data Safety**: authorization, validation, injection, secrets, destructive operations, data loss, privacy.
 - **Performance / Concurrency**: async races, caching errors, resource leaks, excessive work, ordering bugs.
 
-Tell each reviewer to return only evidence-backed candidate findings for its focus area. Do not ask every reviewer to review everything.
+Each reviewer returns only evidence-backed candidate findings for its own focus.
 
 ## Phase 5: Finding Consolidation
 
-Merge all reviewer outputs into one findings list.
+Merge reviewer outputs into one findings list:
 
-Rules:
-
-- Findings must be supported by the diff or directly relevant surrounding context.
-- Each finding must include a file and line reference when possible.
-- Do not report style preferences, speculative rewrites, or generic best practices unless they create a concrete bug risk.
-- If evidence is incomplete, move the item to `Questions` or `Residual Risks` instead of `Findings`.
-- Deduplicate overlapping findings and keep the clearest impact statement.
+- Every finding must be supported by the diff or directly relevant context, with a file:line reference when possible.
+- No style preferences, speculative rewrites, or generic best practices unless they create a concrete bug risk.
+- Incomplete evidence → move to `Questions` or `Residual Risks`, not `Findings`.
+- Deduplicate overlaps; keep the clearest impact statement.
 - Order by severity: Critical, High, Medium, Low.
 
 Severity guide:
 
-- **Critical**: data loss, security bypass, production outage, irreversible corruption, or severe user impact likely.
+- **Critical**: data loss, security bypass, production outage, irreversible corruption, severe user impact likely.
 - **High**: clear bug/regression in a common or important path.
-- **Medium**: bug in an edge path, compatibility break, missing validation, or test gap likely to hide regressions.
-- **Low**: minor bug risk, confusing behavior, narrow edge case, or maintainability issue with direct defect potential.
+- **Medium**: edge-path bug, compatibility break, missing validation, or test gap likely to hide regressions.
+- **Low**: minor bug risk, confusing behavior, narrow edge case, maintainability issue with direct defect potential.
 
 ## Phase 6: Final Response
 
-Use `references/output-format.md`. Findings must be the primary focus of the response.
-
-If there are findings, present them first and keep summaries brief. If there are no findings, explicitly state `No findings` and include residual risks or testing gaps.
-
-Never bury a bug finding below a summary.
+Use `references/output-format.md`. Findings are the primary focus: present them first, keep summaries brief, never bury a bug below a summary. No findings → explicitly state `No findings` and include residual risks or testing gaps.
 
 ## Review Discipline
 
-- Think like a code reviewer, not a feature planner.
-- Focus on whether the change introduces new bugs.
+- Think like a code reviewer, not a feature planner: does the change introduce new bugs?
 - Verify claims against code context before reporting.
 - Prefer one strong finding over many weak suggestions.
-- Do not modify files unless the user explicitly asks you to fix the review findings.
-- If tests or builds are needed to validate a suspected issue, mention the exact command or missing coverage.
+- Do not modify files unless the user explicitly asks you to fix the findings.
+- If tests/builds are needed to validate a suspected issue, name the exact command or missing coverage.

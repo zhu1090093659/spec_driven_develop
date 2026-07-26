@@ -128,4 +128,4 @@ After consolidating a delivery batch's parallel results, aggregate the adaptive 
 1. Sum only the `task_drift` contributions returned by lane agents and not already recorded
 2. Add that sum to cumulative `drift_score` once in the Milestone description (GitHub modes) or MASTER.md (LOCAL_ONLY)
 3. Evaluate thresholds against the new cumulative score
-4. If any threshold is exceeded → trigger the appropriate response (see `references/adaptive-control.md` § 3) BEFORE starting the next delivery batch
+4. If any threshold is exceeded → trigger the appropriate response (see `references/adaptive-control.md` § "Automatic Response Actions") BEFORE starting the next delivery batch
