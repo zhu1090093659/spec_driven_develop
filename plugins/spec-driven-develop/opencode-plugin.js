@@ -55,7 +55,7 @@ const loadAssets = async () => {
           },
           "task-executor": {
             description:
-              "Executes a coherent delivery batch or one assigned lane from a phased plan. Implements and commits the work, but leaves integration state, cumulative telemetry, and the single batch PR to the orchestrator.",
+              "Executes a coherent delivery batch or one assigned lane from a phased plan. Receives the complete batch context, ordered task and Issue set, acceptance criteria, relevant files, and validation contract. Implements and commits the work, but leaves integration state, cumulative telemetry, and the single batch PR to the orchestrator.",
             mode: "subagent",
             prompt: taskExecutor,
           },
