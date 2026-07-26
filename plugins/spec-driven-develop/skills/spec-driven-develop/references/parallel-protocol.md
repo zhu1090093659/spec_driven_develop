@@ -1,6 +1,6 @@
 # Parallel Execution Protocol
 
-This protocol defines how the generated sub-SKILL (and the agent using it) should leverage sub-agents during actual development work. Issues are task units; delivery batches are integration and PR units. It applies throughout the implementation, not to a specific phase.
+This protocol defines how the agent should leverage sub-agents during actual development work. Issues are task units; delivery batches are integration and PR units. It applies throughout the implementation, not to a specific phase.
 
 ---
 
@@ -27,7 +27,7 @@ For each parallel lane in the current dependency-ready wave:
    - Per-task acceptance criteria, test expectations, and explicit no-test rationales, if any
    - Per-task memory/governance impact and expected surface updates, if any
    - Relevant source file paths (from `docs/analysis/module-inventory.md`)
-   - Coding standards from the sub-SKILL
+   - Coding standards from the orchestrator's dispatch input
    - Current project governance context from the resolved instruction and memory surfaces
    - Summary of completed prerequisite tasks and their outputs
 

@@ -9,7 +9,7 @@ Templates for Phase 6 (Archive). Output to `docs/archives/`.
 ```markdown
 # Project Archives
 
-This directory contains archived artifacts from completed Spec-Driven Develop workflows. Each subdirectory represents one development project, preserving its full analysis, plan, progress history, and task-specific skill for future reference.
+This directory contains archived artifacts from completed Spec-Driven Develop workflows. Each subdirectory represents one development project, preserving its full analysis, plan, and progress history for future reference.
 
 | Project | Description | Period | Mode | Progress |
 |:--------|:------------|:-------|:-----|:---------|
@@ -36,13 +36,11 @@ docs/archives/<project-name>/
 │   ├── MASTER.md
 │   ├── phase-1-<short-name>.md
 │   └── ...
-├── governance/
-│   ├── instruction-surfaces.md
-│   ├── AGENTS.md              # if resolved and file-backed
-│   ├── CLAUDE.md              # if resolved and file-backed
-│   └── memory-surface.md      # export note or fallback snapshot, if available
-└── skill/
-    └── SKILL.md
+└── governance/
+    ├── instruction-surfaces.md
+    ├── AGENTS.md              # if resolved and file-backed
+    ├── CLAUDE.md              # if resolved and file-backed
+    └── memory-surface.md      # export note or fallback snapshot, if available
 ```
 
 Archive governance surfaces as snapshots or export notes only. Keep active instruction and memory surfaces in place after archiving. If memory is native and cannot be exported, record its platform/name and the key decisions that were written there.

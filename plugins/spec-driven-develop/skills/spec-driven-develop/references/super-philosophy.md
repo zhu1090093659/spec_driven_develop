@@ -125,3 +125,24 @@ The natural consequence and ultimate goal of S + U + P + E.
 |  3+ No   -> Technical debt alert         |
 +------------------------------------------+
 ```
+
+---
+
+## S.U.P.E.R Code Review Checklist (10 checks)
+
+Run this checklist after every task before marking it complete. This is the agent-canonical copy of the checklist also shown in the user-facing README; keep the two in sync.
+
+| Check | Principle |
+|:------|:----------|
+| Every new module/file has exactly one responsibility | S |
+| No function does more than one conceptual thing | S |
+| Data flows input → processing → output, no reverse deps | U |
+| No circular imports introduced | U |
+| Cross-module interfaces are schema-defined | P |
+| Module I/O is serializable | P |
+| No hardcoded paths, URLs, keys, or config values | E |
+| All new dependencies explicitly declared | E |
+| New modules can be replaced without changes to others | R |
+| All tests pass after the change | — |
+
+**Scoring rule:** All pass = proceed. 1-2 fail = fix before marking complete. 3+ fail = stop and refactor.

@@ -53,7 +53,7 @@ Spec-Driven Develop 是一个开源、平台无关的 AI Coding Agent 工作流�
 
 ## 它做什么
 
-当你对 Agent 说"把这个项目用 Rust 重写"或"迁移到微服务架构"时，Spec-Driven Develop 会启动一条 6 阶段的流水线：
+当你对 Agent 说"把这个项目用 Rust 重写"或"迁移到微服务架构"时，Spec-Driven Develop 会启动一条 7 阶段的流水线（Phase 0-6）：
 
 ```
 Phase 0  快速意图捕获              捕获高层方向（1-2 句话）

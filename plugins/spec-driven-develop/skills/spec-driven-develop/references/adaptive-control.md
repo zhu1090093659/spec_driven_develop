@@ -12,7 +12,7 @@ The workflow is modeled as a **closed-loop control system**:
 |:-----------------------|:-----------------|
 | **Plant** (被控对象) | The codebase under transformation |
 | **Set point** (目标) | Phase 2 confirmed task definition + S.U.P.E.R principles |
-| **Controller** | The SKILL workflow (Phases 0-7) + this adaptive protocol |
+| **Controller** | The SKILL workflow (Phases 0-6) + this adaptive protocol |
 | **Actuator** | Delivery batch executors and lane workers (sequential or parallel) |
 | **Sensor** | Post-task telemetry collection |
 | **Error signal** | `drift_score` — cumulative plan-vs-reality deviation |
@@ -41,7 +41,7 @@ Record the **effort delta** as the number of levels between estimated and actual
 
 ### 1.2 S.U.P.E.R Score Delta
 
-Run the S.U.P.E.R Code Review Checklist (10 checks). Compare the pass count against the task's baseline expectation:
+Run the S.U.P.E.R Code Review Checklist (10 checks) defined in `super-philosophy.md` § "S.U.P.E.R Code Review Checklist (10 checks)". Compare the pass count against the task's baseline expectation:
 - If the task's S.U.P.E.R drivers indicated it should improve specific principles, and the checklist shows improvement → delta = positive
 - If the checklist shows no improvement where improvement was expected → delta = 0 (counts as deviation)
 - If the checklist shows regression → delta = negative
