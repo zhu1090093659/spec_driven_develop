@@ -20,24 +20,12 @@ let assetsPromise
 const loadAssets = async () => {
   if (!assetsPromise) {
     assetsPromise = Promise.all([
-      readPrompt("commands/spec-dev.md"),
-      readPrompt("commands/dp.md"),
       readPrompt("agents/project-analyzer.md"),
       readPrompt("agents/task-architect.md"),
       readPrompt("agents/task-executor.md"),
       readPrompt("agents/code-reviewer.md"),
     ]).then(
-      ([specDevCommand, deepDiscussCommand, projectAnalyzer, taskArchitect, taskExecutor, codeReviewer]) => ({
-        commands: {
-          "spec-dev": {
-            description: "Launch the Spec-Driven Development workflow for a large-scale project task",
-            template: specDevCommand,
-          },
-          dp: {
-            description: "Launch structured deep discussion for problem analysis, solution design, and brainstorming",
-            template: deepDiscussCommand,
-          },
-        },
+      ([projectAnalyzer, taskArchitect, taskExecutor, codeReviewer]) => ({
         agents: {
           "project-analyzer": {
             description:
@@ -80,13 +68,6 @@ export const SpecDrivenDevelopPlugin = async () => {
     config: (cfg) => {
       cfg.skills ??= {}
       cfg.skills.paths = unique([...(cfg.skills.paths ?? []), skillsPath])
-
-      cfg.command ??= {}
-      for (const [name, command] of Object.entries(assets.commands)) {
-        if (!cfg.command[name]) {
-          cfg.command[name] = command
-        }
-      }
 
       cfg.agent ??= {}
       for (const [name, agent] of Object.entries(assets.agents)) {

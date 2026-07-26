@@ -14,8 +14,12 @@ echo "[2/3] Installing to Codex..."
 bash "$SCRIPT_DIR/install-codex.sh"
 echo ""
 
-echo "[3/3] Installing to OpenCode..."
+echo "[3/4] Installing to OpenCode..."
 bash "$SCRIPT_DIR/install-opencode.sh"
+echo ""
+
+echo "[4/4] Syncing to ~/.agents/skills..."
+bash "$SCRIPT_DIR/install-agents.sh"
 echo ""
 
 echo "=== Done ==="
