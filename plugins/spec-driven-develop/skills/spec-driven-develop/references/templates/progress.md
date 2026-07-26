@@ -16,7 +16,7 @@ Templates for the tracking documents generated in Phase 4 (Progress Tracking Doc
 Use this template when the tracking mode is `GITHUB_FULL` or `GITHUB_STANDARD`. MASTER.md serves as a lightweight local index pointing to GitHub resources. Actual task status lives in GitHub Issues.
 
 ```markdown
-# [Task Name] — Progress Tracker
+# [Task Name] -- Progress Tracker
 
 > **Task**: One-line description
 > **Started**: YYYY-MM-DD
@@ -113,7 +113,7 @@ gh pr list -R {repo} --state open --search "in:title Batch" --json number,title,
 Use this template when the tracking mode is `LOCAL_ONLY`. This is the original full-fidelity progress tracking format.
 
 ```markdown
-# [Task Name] — Progress Tracker
+# [Task Name] -- Progress Tracker
 
 > **Task**: One-line description
 > **Started**: YYYY-MM-DD
