@@ -51,7 +51,7 @@ For each task within a phase:
 - **Effort**: S (< 1 hour), M (1-4 hours), L (4-8 hours), XL (> 8 hours)
 - **Dependencies**: Which tasks must be completed first (by task ID)
 - **Delivery Batch**: Which phase-local implementation/integration/PR batch owns the task
-- **Acceptance Criteria**: Concrete conditions that prove the task is done
+- **Acceptance Criteria**: Concrete, checkbox-style conditions that prove the task is done. Each criterion must be independently verifiable by an independent reviewer agent without re-deriving intent — name exact files, commands, and expected outcomes. Reviewer agents consume these criteria as their review checklist.
 - **Test Expectation**: Required test additions/updates, or an explicit no-test rationale plus closest validation command
 - **Memory/Governance Impact**: Whether the task can update the resolved memory surface or any resolved instruction surface
 - **Source Reference**: Which original module/file this task relates to
@@ -75,6 +75,7 @@ For each phase, identify **parallel lanes** — groups of tasks that have no mut
 For each lane:
 - **Lane ID**: e.g. `P2-Lane-A`, `P2-Lane-B`
 - **Tasks**: Which tasks belong to this lane
+- **Key files**: The files this lane owns, so a reviewer agent can scope its diff
 - **Estimated time**: Combined effort of the lane (determines wall-clock time for the phase)
 - **Merge risk**: Low / Medium / High — likelihood of merge conflicts between lanes (based on file overlap)
 

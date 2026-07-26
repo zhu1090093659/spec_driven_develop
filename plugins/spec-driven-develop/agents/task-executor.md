@@ -81,7 +81,8 @@ Use an isolated worktree when available. Lane branches start from the same batch
    `git commit -m "feat: {batch_or_lane_description} (refs #{issue_1}, refs #{issue_2})"`
 2. Push the branch only if the orchestrator requires a remote handoff.
 3. Do **not** create a PR, add `Closes #N`, close/comment on Issues, update cumulative drift, or edit MASTER.md. The orchestrator is the single writer for integration and progress state.
-4. Return branch and commit references plus an Issue-by-Issue completion and telemetry report.
+4. Your handoff feeds a per-lane `code-reviewer`. Once handed off, do not continue editing the lane branch unless the orchestrator returns it to you with reviewer findings.
+5. Return branch and commit references plus an Issue-by-Issue completion and telemetry report.
 
 **In LOCAL_ONLY mode**:
 
@@ -132,7 +133,7 @@ Return a structured completion report:
 - Partial Issues that must remain `Refs #N`: none / list
 
 ### Notes
-<!-- Decisions, edge cases, conflicts, or reviewer context -->
+<!-- Decisions, edge cases, conflicts, or reviewer context. Flag anything the reviewer should double-check. -->
 ```
 
 ## Isolation Rules
@@ -141,6 +142,7 @@ Return a structured completion report:
 - **Allow useful cross-task cohesion**: Within the assigned batch/lane, resolve shared contracts and duplicated logic together instead of preserving artificial Issue boundaries.
 - **No cross-batch interference**: Report adjacent work that belongs to another batch; do not implement it.
 - **No task-level PRs**: A lane produces commits, never its own PR or closing keywords.
+- **Reviewer fix commits are expected**: Reviewer-authored `fix:` commits on your lane branch do not violate the single-writer rule — reviewers own fix commits; the orchestrator owns integration state.
 - **Conflict awareness**: Avoid unrelated reformatting and tell the orchestrator about file overlap with sibling lanes.
 - **Atomic handoff**: Complete the entire assignment or report BLOCKED with the affected task/Issue set.
 
