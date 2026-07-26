@@ -78,6 +78,12 @@ Phase 5  确认并执行                展示规划摘要，获得确认，
 Phase 6  归档                      保存所有工件以便溯源
 ```
 
+### 编排者中心执行与纯 Skill 形态（v1.15 更新）
+
+执行采用**编排者中心**模式：主 Agent 负责整体进度与质量，子 Agent 的分派是一个经济性决策，而非默认行为。默认由编排者直接执行（Tier 0）；单个 `task-executor` coder（Tier 1）处理较大或上下文较重的批次；并行泳道（Tier 2）则要求文件集互不相交、每条泳道 ≥ L 工作量、可独立验证且泳道数 ≤ 4。审查同样分级——机器校验（L1）与编排者自己的 diff 审查（L2）是默认，独立的 `code-reviewer` Agent（L3）只保留给 Tier 2 泳道和高风险变更。Reviewer 对照验收标准审查泳道 diff 并直接把修复提交到泳道分支；只有结论为 APPROVED 或 FIXED 的泳道才会被集成。
+
+插件为**纯 Skill** 形态——工作流通过 Skill 触发，不再使用斜杠命令。所有 Prompt 遵循单一来源风格规则（每个句子只能是规则、契约或指针），每个主题只在唯一一份权威参考里定义。新增的 `scripts/install-agents.sh` 会把 bundled skills 同步到 `~/.agents/skills`，供读取该共享目录的 Agent 使用。
+
 ### GitHub 原生任务追踪与批次 PR（v1.14 更新）
 
 当检测到 GitHub 仓库时，工作流会自动为每个任务创建 **GitHub Issue**，使用 **Milestone**（每个阶段一个）、**Label**（优先级、规模、泳道）组织，并可选创建 **GitHub Projects** 看板。开始开发前，工作流会审视当前阶段的完整 Issue 集，再按依赖、共享文件/契约、验证范围、审查边界和回滚边界组成 **Delivery Batch（交付批次）**。Issue 继续承担原子验收和逐任务遥测；交付批次承担集成分支、整体验证和 PR。

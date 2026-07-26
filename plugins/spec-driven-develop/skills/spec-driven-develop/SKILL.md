@@ -10,7 +10,7 @@ description: >-
   progress tracking setup, and then executes the plan within the same session. Keeps Issues as
   task-tracking units while batching related implementation into coherent reviewable PRs.
 metadata:
-  version: 1.14.0
+  version: 1.15.0
 ---
 
 # Spec-Driven Develop

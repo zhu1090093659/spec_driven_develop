@@ -29,6 +29,6 @@ These instructions apply to the whole repository.
 Run the standing consistency guard first; it subsumes the Python byte-compile check. Then use the closest checks for the changed surface:
 
 - `bash scripts/validate.sh`
-- `bash -n scripts/install-codex.sh scripts/install-cursor.sh scripts/install-opencode.sh scripts/install-all.sh`
+- `bash -n scripts/install-codex.sh scripts/install-cursor.sh scripts/install-opencode.sh scripts/install-agents.sh scripts/install-all.sh`
 - Targeted `rg` checks for newly required workflow language
 - `git diff --check`
