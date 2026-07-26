@@ -197,9 +197,9 @@ SKILL 的 prompt 以通用、平台中立的方式编写。在缺少某些能力
 
 **已测试并提供安装脚本的平台：**
 
-- **Claude Code** — 以插件形式安装（支持增强的 Agent/命令能力）
+- **Claude Code** — 以插件形式安装（支持增强的子 Agent 能力）
 - **Codex (OpenAI)** — 以 Codex 插件形式安装，或直接以 Skill 形式安装
-- **opencode / OpenCode** — 以自动加载插件形式安装，并附带 skills、commands 和子 Agent
+- **opencode / OpenCode** — 以自动加载插件形式安装，并附带 skills 和子 Agent
 - **Cursor** — 以全局或项目级 Skill 形式安装
 
 **其他任意 Agent** — 把 `SKILL.md`（如果需要完整的模板和协议支持，再加上 `references/` 目录）复制到你的 Agent 读取指令的位置。这些文件没有外部依赖，没有平台特定逻辑。Windsurf、Cline、Aider、Continue、Roo Code、Augment，或其他任何能读 Markdown 技能/系统提示词的 Coding Agent，都能直接使用。
@@ -408,20 +408,18 @@ spec_driven_develop/
 │   │   ├── task-architect.md
 │   │   ├── task-executor.md
 │   │   └── code-reviewer.md
-│   └── commands/                             # 斜杠命令（Claude Code）
-│       ├── spec-dev.md                       # /spec-dev — 启动规范驱动工作流
-│       └── dp.md                             # /dp — 启动深度讨论
 ├── scripts/                                  # 安装与工具脚本
 │   ├── install-cursor.sh
 │   ├── install-codex.sh
 │   ├── install-opencode.sh
+│   ├── install-agents.sh                     # 同步 bundled skills 到 ~/.agents/skills
 │   ├── install-all.sh
 │   ├── export-progress.py                    # 进度导出为 JSON
 │   └── review-context.py                     # Review SPD 的仓库便捷 wrapper
 └── LICENSE
 ```
 
-跨平台使用的核心文件是各 `SKILL.md` 文件、`references/` 目录和打包的辅助脚本。其他的——agents、commands、插件清单、插件入口、marketplace 元数据——都是 Claude Code、Codex 或 OpenCode 平台上的增强功能。
+跨平台使用的核心文件是各 `SKILL.md` 文件、`references/` 目录和打包的辅助脚本。其他的——agents、插件清单、插件入口、marketplace 元数据——都是 Claude Code、Codex 或 OpenCode 平台上的增强功能。
 
 ## 常见问题 FAQ
 

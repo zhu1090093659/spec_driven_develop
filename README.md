@@ -218,9 +218,9 @@ The SKILL prompt is written in a generic, platform-neutral way. It gracefully de
 
 **Tested platforms with install scripts:**
 
-- **Claude Code** — installed as a plugin (with enhanced agent/command support)
+- **Claude Code** — installed as a plugin (with enhanced sub-agent support)
 - **Codex (OpenAI)** — installed as a Codex plugin or directly as a skill
-- **opencode / OpenCode** — installed as an auto-loaded plugin with bundled skills, commands, and sub-agents
+- **opencode / OpenCode** — installed as an auto-loaded plugin with bundled skills and sub-agents
 - **Cursor** — installed as a global or project-level skill
 
 **Any other agent** — copy `SKILL.md` (plus the `references/` directory if you want full template and protocol support) to wherever your agent reads instructions. The files have no external dependencies and no platform-specific logic. Works with Windsurf, Cline, Aider, Continue, Roo Code, Augment, or any other coding agent that reads Markdown-based skills or system prompts.
@@ -429,20 +429,18 @@ spec_driven_develop/
 │   │   ├── task-architect.md
 │   │   ├── task-executor.md
 │   │   └── code-reviewer.md
-│   └── commands/                             # Slash commands (Claude Code)
-│       ├── spec-dev.md                       # /spec-dev — launch spec-driven workflow
-│       └── dp.md                             # /dp — launch deep discussion
 ├── scripts/                                  # Installation & utility scripts
 │   ├── install-cursor.sh
 │   ├── install-codex.sh
 │   ├── install-opencode.sh
+│   ├── install-agents.sh                     # Sync bundled skills to ~/.agents/skills
 │   ├── install-all.sh
 │   ├── export-progress.py                    # Export progress to JSON
 │   └── review-context.py                     # Repo convenience wrapper for Review SPD
 └── LICENSE
 ```
 
-The essential files for cross-platform use are the `SKILL.md` files, their `references/` directories, and packaged helper scripts. Everything else — agents, commands, plugin manifests, plugin entrypoints, and marketplace metadata — is platform-specific enhancement for Claude Code, Codex, or OpenCode.
+The essential files for cross-platform use are the `SKILL.md` files, their `references/` directories, and packaged helper scripts. Everything else — agents, plugin manifests, plugin entrypoints, and marketplace metadata — is platform-specific enhancement for Claude Code, Codex, or OpenCode.
 
 ## FAQ
 
