@@ -80,15 +80,6 @@ Be specific. Always include file paths and line references. Estimate sizes with 
 
 ## Optional: GitHub Pre-flight Check
 
-If instructed by the orchestrator, run the GitHub integration pre-flight check after completing the analysis. This determines the task tracking mode for the workflow.
-
-```bash
-# Check gh CLI, auth, repo, issue access, and project access
-gh --version > /dev/null 2>&1 && \
-gh auth status > /dev/null 2>&1 && \
-gh repo view --json nameWithOwner -q '.nameWithOwner' > /dev/null 2>&1 && \
-gh issue list --limit 1 > /dev/null 2>&1 && \
-{ gh project list --limit 1 > /dev/null 2>&1 && echo "GITHUB_FULL" || echo "GITHUB_STANDARD"; } || echo "LOCAL_ONLY"
-```
+If instructed by the orchestrator, run the GitHub integration pre-flight check after completing the analysis. Follow `references/github-integration.md` § "Pre-flight Check" exactly — do not substitute a shortened inline pipeline. This determines the task tracking mode for the workflow.
 
 Append the detected mode to your analysis output under a `## GitHub Integration Mode` section.

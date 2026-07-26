@@ -12,7 +12,7 @@ The workflow is modeled as a **closed-loop control system**:
 |:-----------------------|:-----------------|
 | **Plant** (被控对象) | The codebase under transformation |
 | **Set point** (目标) | Phase 2 confirmed task definition + S.U.P.E.R principles |
-| **Controller** | The SKILL workflow (Phases 0-7) + this adaptive protocol |
+| **Controller** | The SKILL workflow (Phases 0-6) + this adaptive protocol |
 | **Actuator** | Delivery batch executors and lane workers (sequential or parallel) |
 | **Sensor** | Post-task telemetry collection |
 | **Error signal** | `drift_score` — cumulative plan-vs-reality deviation |
