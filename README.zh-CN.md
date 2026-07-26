@@ -82,7 +82,7 @@ Phase 6  归档                      保存所有工件以便溯源
 
 当检测到 GitHub 仓库时，工作流会自动为每个任务创建 **GitHub Issue**，使用 **Milestone**（每个阶段一个）、**Label**（优先级、规模、泳道）组织，并可选创建 **GitHub Projects** 看板。开始开发前，工作流会审视当前阶段的完整 Issue 集，再按依赖、共享文件/契约、验证范围、审查边界和回滚边界组成 **Delivery Batch（交付批次）**。Issue 继续承担原子验收和逐任务遥测；交付批次承担集成分支、整体验证和 PR。
 
-默认是每个阶段形成一个边界清楚、可审查的批次 PR，而不是一个 Issue 一个 PR。并行泳道 Agent 可以在隔离 worktree 中开发，但只把 commits 交给批次分支，不创建任务级 PR。最终集成 PR 为每个已完成 Issue 各写一行 `Closes #N`。只有在审查、独立发布/回滚、所有权、风险隔离、硬依赖或仓库策略确实要求时才拆分；单 Issue PR 同样必须记录理由。
+默认是每个阶段形成一个边界清楚、可审查的批次 PR，而不是一个 Issue 一个 PR。并行泳道 Agent 可以在隔离 worktree 中开发，但只把 commits 交给批次分支，不创建任务级 PR。整合之前，每条泳道还会经过一个独立的 `code-reviewer` 子 Agent：它对照验收标准审查该泳道的 diff，并直接把修复提交到泳道分支。最终集成 PR 为每个已完成 Issue 各写一行 `Closes #N`。只有在审查、独立发布/回滚、所有权、风险隔离、硬依赖或仓库策略确实要求时才拆分；单 Issue PR 同样必须记录理由。
 
 三种模式根据环境自动检测：
 
@@ -406,7 +406,8 @@ spec_driven_develop/
 │   ├── agents/                               # Claude Code 子 Agent（可选增强）
 │   │   ├── project-analyzer.md
 │   │   ├── task-architect.md
-│   │   └── task-executor.md
+│   │   ├── task-executor.md
+│   │   └── code-reviewer.md
 │   └── commands/                             # 斜杠命令（Claude Code）
 │       ├── spec-dev.md                       # /spec-dev — 启动规范驱动工作流
 │       └── dp.md                             # /dp — 启动深度讨论

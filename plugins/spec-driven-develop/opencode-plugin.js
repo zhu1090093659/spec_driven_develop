@@ -25,8 +25,9 @@ const loadAssets = async () => {
       readPrompt("agents/project-analyzer.md"),
       readPrompt("agents/task-architect.md"),
       readPrompt("agents/task-executor.md"),
+      readPrompt("agents/code-reviewer.md"),
     ]).then(
-      ([specDevCommand, deepDiscussCommand, projectAnalyzer, taskArchitect, taskExecutor]) => ({
+      ([specDevCommand, deepDiscussCommand, projectAnalyzer, taskArchitect, taskExecutor, codeReviewer]) => ({
         commands: {
           "spec-dev": {
             description: "Launch the Spec-Driven Development workflow for a large-scale project task",
@@ -54,9 +55,15 @@ const loadAssets = async () => {
           },
           "task-executor": {
             description:
-              "Executes a single development task from the phased plan, including implementation, tests, and structured completion reporting.",
+              "Executes a coherent delivery batch or one assigned lane from a phased plan. Implements and commits the work, but leaves integration state, cumulative telemetry, and the single batch PR to the orchestrator.",
             mode: "subagent",
             prompt: taskExecutor,
+          },
+          "code-reviewer": {
+            description:
+              "Reviews one execution lane's diff against its per-task acceptance criteria, commits fixes directly to the lane branch, and returns a structured verdict to the orchestrator. Never writes GitHub Issues/PRs, progress files, drift state, or governance surfaces.",
+            mode: "subagent",
+            prompt: codeReviewer,
           },
         },
       }),

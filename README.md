@@ -82,7 +82,7 @@ Phase 6  Archive                   Preserve all artifacts for traceability
 
 When a GitHub repository is detected, the workflow automatically creates **GitHub Issues** for every task, organized with **Milestones** (one per phase), **Labels** (priority, size, lane), and optionally a **GitHub Projects** board. Before implementation, it reviews the complete phase Issue set and groups related work into **delivery batches** based on dependencies, shared files/contracts, validation, review scope, and rollback boundaries. Issues remain atomic acceptance and telemetry records; a delivery batch owns the integration branch, aggregate validation, and PR.
 
-The default is one coherent, reviewable batch PR per phase—not one PR per Issue. Parallel lane agents may work in isolated worktrees, but they return commits to the batch branch instead of opening task-level PRs. The integrated PR includes one `Closes #N` line for every completed Issue. Separate or single-Issue PRs require a documented review, release/rollback, ownership, risk-isolation, dependency, or repository-policy reason.
+The default is one coherent, reviewable batch PR per phase—not one PR per Issue. Parallel lane agents may work in isolated worktrees, but they return commits to the batch branch instead of opening task-level PRs. Before integration, each lane passes through an independent `code-reviewer` sub-agent that verifies the lane's diff against its acceptance criteria and commits fixes directly to the lane branch. The integrated PR includes one `Closes #N` line for every completed Issue. Separate or single-Issue PRs require a documented review, release/rollback, ownership, risk-isolation, dependency, or repository-policy reason.
 
 Three modes are auto-detected based on environment:
 
@@ -427,7 +427,8 @@ spec_driven_develop/
 │   ├── agents/                               # Claude Code sub-agents (optional)
 │   │   ├── project-analyzer.md
 │   │   ├── task-architect.md
-│   │   └── task-executor.md
+│   │   ├── task-executor.md
+│   │   └── code-reviewer.md
 │   └── commands/                             # Slash commands (Claude Code)
 │       ├── spec-dev.md                       # /spec-dev — launch spec-driven workflow
 │       └── dp.md                             # /dp — launch deep discussion
