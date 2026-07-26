@@ -78,6 +78,12 @@ Phase 5  Confirm & Execute         Present plan summary, get confirmation,
 Phase 6  Archive                   Preserve all artifacts for traceability
 ```
 
+### Orchestrator-Centric Execution and Skills-Only Surface (Updated in v1.15)
+
+Execution is **orchestrator-centric**: the main agent owns progress and quality, and sub-agent dispatch is an economic decision, not a default. Orchestrator-direct execution (Tier 0) is the norm; a single `task-executor` coder (Tier 1) handles large or context-heavy batches; parallel lanes (Tier 2) require disjoint file sets, ≥ L effort per lane, independent verifiability, and ≤ 4 lanes. Review is likewise tiered — machine validation (L1) and the orchestrator's own diff review (L2) are the default, while an independent `code-reviewer` agent (L3) is reserved for Tier 2 lanes and high-risk changes. Reviewer agents verify lane diffs against acceptance criteria and commit fixes directly to lane branches; only APPROVED or FIXED lanes integrate.
+
+The plugin is **skills-only** — workflows are invoked through skills, not slash commands. All prompts follow a single-sourcing style rule (every sentence is a rule, a contract, or a pointer), with each topic defined in exactly one canonical reference. A new `scripts/install-agents.sh` syncs the bundled skills to `~/.agents/skills` for agents that read that shared directory.
+
 ### GitHub-Native Task Tracking and Batch PRs (Updated in v1.14)
 
 When a GitHub repository is detected, the workflow automatically creates **GitHub Issues** for every task, organized with **Milestones** (one per phase), **Labels** (priority, size, lane), and optionally a **GitHub Projects** board. Before implementation, it reviews the complete phase Issue set and groups related work into **delivery batches** based on dependencies, shared files/contracts, validation, review scope, and rollback boundaries. Issues remain atomic acceptance and telemetry records; a delivery batch owns the integration branch, aggregate validation, and PR.
