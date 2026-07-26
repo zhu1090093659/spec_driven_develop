@@ -10,7 +10,7 @@ Sub-agent dispatch is an economic decision, not a default. A sub-agent pays a co
 
 Choose per delivery batch:
 
-- **Tier 0 — orchestrator-direct (default)**: tasks are S/M effort, touch few files, you already hold the context, or acceptance is machine-verifiable. Execute directly on the batch integration branch. No sub-agents, no worktrees.
+- **Tier 0 — orchestrator-direct (default)**: tasks are S/M effort, touch ≤ 3 files, you already hold the context, or acceptance is machine-verifiable. Execute directly on the batch integration branch. No sub-agents, no worktrees.
 - **Tier 1 — single coder**: L/XL task bundles, heavy exploratory reading, or outputs long enough to pollute your context. Delegate the complete batch to one `task-executor`.
 - **Tier 2 — parallel lanes**: only when ALL hold — lane file sets are disjoint, each lane is ≥ L effort, each lane is independently verifiable, and there are ≤ 4 lanes. Launch one `task-executor` per dependency-ready lane in isolated worktrees.
 
