@@ -103,7 +103,7 @@ Use `references/output-format.md`. Findings are the primary focus: present them 
 
 After the findings-first text, also emit a structured JSON block (see `references/output-format.md` → "## Structured JSON") so the result can be consumed by an Agent or downstream tooling. The two outputs MUST be derived from the same findings list; never let the JSON disagree with the text.
 
-JSON `mode` uses open-code-review-delegate-compatible values: `workspace` (review-spd uncommitted mode), `range` (review-spd commit-range **and** branch/PR mode — branch comparisons emit `range` with explicit `from`/`to`), `commit` (single commit). Do not emit a separate `branch` mode; this keeps the JSON consumable by ocr downstream consumers without translation.
+JSON `mode` uses open-code-review-delegate-compatible values: `workspace` (review-spd uncommitted mode), `range` (review-spd commit-range **and** branch/PR mode — branch comparisons emit `range` with `from` = base (e.g. `upstream/main`) and `to` = head (the feature branch), matching `review-context.py` `base`/`head`), `commit` (single commit). Do not emit a separate `branch` mode; this keeps the JSON consumable by ocr downstream consumers without translation.
 
 Map each reviewer focus to a JSON `category`:
 

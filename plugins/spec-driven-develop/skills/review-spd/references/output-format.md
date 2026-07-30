@@ -83,9 +83,10 @@ No findings.
 
 ## Severity Rollup
 
+Severity levels are defined **authoritatively** in `SKILL.md` → Phase 5 "Severity guide" (Critical / High / Medium / Low). Grade findings using those definitions; this section only adds rollup presentation rules.
+
 - `critical` / `high`: always report — bugs, security, and data-loss risks.
-- `medium`: performance, error-handling, maintainability — include context.
-- `low`: minor correctness/clarity suggestions — only when clearly valuable. Do not proactively hunt for style issues; this stays consistent with the findings-first discipline that excludes style unless it causes a concrete bug risk.
+- `medium` / `low`: report only when the finding meets the Phase 5 definitions; do not proactively hunt for style issues. This stays consistent with the findings-first discipline that excludes style unless it causes a concrete bug risk.
 - Suspected false positives: silently dropped, never counted.
 
 ## Structured JSON
@@ -93,7 +94,7 @@ No findings.
 Emit the following JSON block after the text report. It MUST stay consistent with the findings listed above (same items, same severities). This schema mirrors `open-code-review-delegate` so both skills produce downstream-compatible output.
 
 Compatibility notes for downstream consumers:
-- `mode` uses open-code-review-delegate-compatible values: `workspace` (review-spd uncommitted mode), `range` (review-spd commit-range **and** branch/PR mode — branch comparisons use `range` with explicit `from`/`to`), `commit` (single commit). No separate `branch` mode is emitted.
+- `mode` uses open-code-review-delegate-compatible values: `workspace` (review-spd uncommitted mode), `range` (review-spd commit-range **and** branch/PR mode — branch comparisons use `range` with `from` = base and `to` = head, matching `review-context.py` `base`/`head`), `commit` (single commit). No separate `branch` mode is emitted.
 - `rules[]` carries a `rule` field but intentionally omits `path_pattern` (review-spd has no file-type rule matching); tolerate its absence.
 - `category` intentionally covers only `bug | security | performance | test | other` (maintainability/style/documentation are excluded by the findings-first discipline); tolerate the narrower set.
 
@@ -123,3 +124,31 @@ Compatibility notes for downstream consumers:
   "summary": { "files_reviewed": 1, "critical": 0, "high": 0, "medium": 0, "low": 0 }
 }
 ```
+
+**Text ↔ JSON consistency example.** The text finding below and the JSON object below MUST describe the same defect — same path, same line range, same severity, same category. This is the "same findings list" discipline from Phase 6.
+
+Text finding:
+
+```markdown
+### Medium
+- [M1] `src/parser.go:88` Nil dereference when input has zero length
+  Impact: Panics on empty input because `input[0]` is read with no length guard.
+  Evidence: `if input[0] == delimiter {` at line 88, no `len(input) == 0` check above.
+  Suggested fix: return a clear error when `len(input) == 0`.
+```
+
+JSON object (same finding):
+
+```json
+{
+  "path": "src/parser.go",
+  "start_line": 88,
+  "end_line": 91,
+  "category": "bug",
+  "severity": "medium",
+  "comment": "Nil dereference when input has zero length: `input[0]` is read with no length guard, panicking on empty input.",
+  "suggestion": "Return a clear error when len(input) == 0 before accessing input[0]."
+}
+```
+
+If the text and JSON ever disagree (different severity, a finding present in one but not the other, or contradictory comment), the JSON is wrong — regenerate it from the text. Never let the two drift.
