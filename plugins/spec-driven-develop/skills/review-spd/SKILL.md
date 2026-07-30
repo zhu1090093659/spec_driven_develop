@@ -99,6 +99,24 @@ Severity guide:
 
 Use `references/output-format.md`. Findings are the primary focus: present them first, keep summaries brief, never bury a bug below a summary. No findings → explicitly state `No findings` and include residual risks or testing gaps.
 
+### Dual output: human-readable text + structured JSON
+
+After the findings-first text, also emit a structured JSON block (see `references/output-format.md` → "## Structured JSON") so the result can be consumed by an Agent or downstream tooling. The two outputs MUST be derived from the same findings list; never let the JSON disagree with the text.
+
+JSON `mode` uses open-code-review-delegate-compatible values: `workspace` (review-spd uncommitted mode), `range` (review-spd commit-range **and** branch/PR mode — branch comparisons emit `range` with `from` = base (e.g. `upstream/main`) and `to` = head (the feature branch), matching `review-context.py` `base`/`head`), `commit` (single commit). Do not emit a separate `branch` mode; this keeps the JSON consumable by ocr downstream consumers without translation.
+
+Map each reviewer focus to a JSON `category`:
+
+| Reviewer focus | JSON `category` |
+|:---------------|:---------------|
+| Correctness / Bug Risk | `bug` |
+| Regression / Compatibility | `bug` (or `other`) |
+| Tests / Verification | `test` |
+| Security / Data Safety | `security` |
+| Performance / Concurrency | `performance` |
+
+Severity maps directly: `critical` / `high` / `medium` / `low`. `files[]` and their `insertions`/`deletions` come from the Phase 2 context script output. Each finding's `start_line`/`end_line` are taken from the diff hunk line numbers of the cited code (matching the `path/to/file:line` already required in the text findings), so the text and JSON stay aligned. Review SPD has no rule engine, so `rules[]` carries a single `rule` field noting review is focus-driven (no `rule.json`); the `path_pattern` field is intentionally absent — downstream consumers should tolerate its absence. The `category` set is intentionally limited to `bug | security | performance | test | other` (maintainability/style/documentation are excluded by the findings-first discipline); downstream consumers should tolerate the narrower set. This JSON shape is intentionally compatible with the `open-code-review-delegate` report schema so both skills can feed the same downstream consumers.
+
 ## Review Discipline
 
 - Think like a code reviewer, not a feature planner: does the change introduce new bugs?
