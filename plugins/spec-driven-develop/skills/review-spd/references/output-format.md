@@ -85,24 +85,29 @@ No findings.
 
 - `critical` / `high`: always report — bugs, security, and data-loss risks.
 - `medium`: performance, error-handling, maintainability — include context.
-- `low`: style/minor suggestions — only when clearly valuable.
+- `low`: minor correctness/clarity suggestions — only when clearly valuable. Do not proactively hunt for style issues; this stays consistent with the findings-first discipline that excludes style unless it causes a concrete bug risk.
 - Suspected false positives: silently dropped, never counted.
 
 ## Structured JSON
 
 Emit the following JSON block after the text report. It MUST stay consistent with the findings listed above (same items, same severities). This schema mirrors `open-code-review-delegate` so both skills produce downstream-compatible output.
 
+Compatibility notes for downstream consumers:
+- `mode` uses open-code-review-delegate-compatible values: `workspace` (review-spd uncommitted mode), `range` (review-spd commit-range **and** branch/PR mode — branch comparisons use `range` with explicit `from`/`to`), `commit` (single commit). No separate `branch` mode is emitted.
+- `rules[]` carries a `rule` field but intentionally omits `path_pattern` (review-spd has no file-type rule matching); tolerate its absence.
+- `category` intentionally covers only `bug | security | performance | test | other` (maintainability/style/documentation are excluded by the findings-first discipline); tolerate the narrower set.
+
 ```json
 {
   "tool": "review-spd",
-  "mode": "uncommitted | range | commit | branch",
+  "mode": "workspace | range | commit",
   "repository": "<repo path>",
   "target": { "type": "workspace | range | commit", "from": "<ref>", "to": "<ref>", "commit": "<hash>" },
   "files": [
     { "path": "src/foo.go", "status": "modified", "insertions": 2, "deletions": 0 }
   ],
   "rules": [
-    { "note": "review-spd is focus-driven; no rule.json engine" }
+    { "rule": "review-spd is focus-driven; no rule.json engine" }
   ],
   "findings": [
     {
