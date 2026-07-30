@@ -80,3 +80,41 @@ No findings.
 - Do not include style-only comments.
 - Do not include broad refactor suggestions unless they prevent a concrete defect.
 - Prefer `No findings` over weak or speculative findings.
+
+## Severity Rollup
+
+- `critical` / `high`: always report — bugs, security, and data-loss risks.
+- `medium`: performance, error-handling, maintainability — include context.
+- `low`: style/minor suggestions — only when clearly valuable.
+- Suspected false positives: silently dropped, never counted.
+
+## Structured JSON
+
+Emit the following JSON block after the text report. It MUST stay consistent with the findings listed above (same items, same severities). This schema mirrors `open-code-review-delegate` so both skills produce downstream-compatible output.
+
+```json
+{
+  "tool": "review-spd",
+  "mode": "uncommitted | range | commit | branch",
+  "repository": "<repo path>",
+  "target": { "type": "workspace | range | commit", "from": "<ref>", "to": "<ref>", "commit": "<hash>" },
+  "files": [
+    { "path": "src/foo.go", "status": "modified", "insertions": 2, "deletions": 0 }
+  ],
+  "rules": [
+    { "note": "review-spd is focus-driven; no rule.json engine" }
+  ],
+  "findings": [
+    {
+      "path": "src/foo.go",
+      "start_line": 10,
+      "end_line": 12,
+      "category": "bug | security | performance | test | other",
+      "severity": "critical | high | medium | low",
+      "comment": "problem description",
+      "suggestion": "fix suggestion (optional)"
+    }
+  ],
+  "summary": { "files_reviewed": 1, "critical": 0, "high": 0, "medium": 0, "low": 0 }
+}
+```
