@@ -452,8 +452,8 @@ Spec-Driven Develop 是一个面向 AI Coding Agent 的纯 Markdown 规范驱动
 ## Star History
 
 <p align="center">
-  <a href="https://www.star-history.com/#zhu1090093659/spec_driven_develop&Date" target="_blank">
-    <img src="https://api.star-history.com/svg?repos=zhu1090093659/spec_driven_develop&type=Date" alt="Star History" width="600">
+  <a href="https://star-history.dera.page/#zhu1090093659/spec_driven_develop&Date" target="_blank">
+    <img src="https://star-history.dera.page/svg?repos=zhu1090093659/spec_driven_develop&type=Date" alt="Star History" width="600">
   </a>
 </p>
 
