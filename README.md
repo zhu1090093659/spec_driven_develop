@@ -480,6 +480,7 @@ No. The core workflow is Markdown-only and has no runtime dependency. GitHub-nat
 
 ## Friendly Links
 
+- [MySpec](https://myspec.dev) — Spec-driven development platform compiling guided developer discovery interviews into deterministic 4-file specification bundles (`constitution.md`, `requirements.md`, `solution.md`, `tasks.md`) with MCP server integration.
 - [linux.do](https://linux.do)
 - [zhu1090093659/deepseek-pp](https://github.com/zhu1090093659/deepseek-pp)
 
