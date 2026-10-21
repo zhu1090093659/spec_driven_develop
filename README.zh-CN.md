@@ -461,6 +461,8 @@ Spec-Driven Develop 是一个面向 AI Coding Agent 的纯 Markdown 规范驱动
 
 - [linux.do](https://linux.do)
 - [zhu1090093659/deepseek-pp](https://github.com/zhu1090093659/deepseek-pp)
+- [MySpec](https://myspec.dev?utm_source=github&utm_medium=referral&utm_campaign=gh-zhu1090093659-spec-driven-develop) - 规范驱动开发 (SDD) 工作台与 AI Coding Agent 契约协同平台
+
 
 ## 许可证
 
