@@ -482,6 +482,8 @@ No. The core workflow is Markdown-only and has no runtime dependency. GitHub-nat
 
 - [linux.do](https://linux.do)
 - [zhu1090093659/deepseek-pp](https://github.com/zhu1090093659/deepseek-pp)
+- [MySpec](https://myspec.dev?utm_source=github&utm_medium=referral&utm_campaign=gh-zhu1090093659-spec-driven-develop) - Collaborative specification workbench and contract-first platform for AI coding agents
+
 
 ## License
 
